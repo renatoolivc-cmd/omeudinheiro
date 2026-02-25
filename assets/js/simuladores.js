@@ -101,32 +101,39 @@
   }
 
   // Age → auto-set slider + label; slider also manually editable
-  function bindAgeSlider(ageId, sliderId, labelId) {
+  function bindAgeSlider(ageId, sliderId, sliderLabelId, maxLabelId) {
     var ageInput = document.getElementById(ageId);
     var slider = document.getElementById(sliderId);
-    var label = document.getElementById(labelId);
-    if (!ageInput || !slider || !label) return;
+    var sliderLabel = document.getElementById(sliderLabelId);
+    var maxLabel = document.getElementById(maxLabelId);
+    if (!ageInput || !slider || !sliderLabel) return;
 
-    function updateLabel() {
+    function updateSliderLabel() {
       var meses = parseInt(slider.value);
-      if (!meses || meses <= 0) { label.textContent = '—'; return; }
-      label.textContent = formatPrazo(meses);
+      if (!meses || meses <= 0) { sliderLabel.textContent = '—'; return; }
+      sliderLabel.textContent = formatPrazo(meses);
     }
 
-    // Age changes → auto-set slider to max prazo
+    // Age changes → update max label + auto-set slider
     ageInput.addEventListener('input', function () {
       var idade = parseInt(ageInput.value);
-      if (isNaN(idade) || idade < 18) { slider.value = 0; label.textContent = '—'; return; }
+      if (isNaN(idade) || idade < 18) {
+        slider.value = 0;
+        sliderLabel.textContent = '—';
+        if (maxLabel) maxLabel.textContent = '—';
+        return;
+      }
       var anos = calcPrazoFromAge(idade);
       var maxMeses = anos * 12;
+      if (maxLabel) maxLabel.textContent = anos + ' anos (' + maxMeses + ' meses)';
       slider.max = maxMeses;
       slider.value = maxMeses;
-      updateLabel();
+      updateSliderLabel();
     });
 
-    // Slider changes → update label only
-    slider.addEventListener('input', updateLabel);
-    updateLabel();
+    // Slider changes → update slider label only
+    slider.addEventListener('input', updateSliderLabel);
+    updateSliderLabel();
   }
 
   // Simple age → label only (for "quanto posso comprar" which has no slider)
@@ -144,8 +151,8 @@
     update();
   }
 
-  bindAgeSlider('ch_idade', 'ch_prazo', 'ch_prazo_label');
-  bindAgeSlider('co_idade', 'co_prazo', 'co_prazo_label');
+  bindAgeSlider('ch_idade', 'ch_prazo', 'ch_prazo_label', 'ch_prazo_auto');
+  bindAgeSlider('co_idade', 'co_prazo', 'co_prazo_label', 'co_prazo_auto');
   bindAgeLabel('ef_idade', 'ef_prazo_auto');
 
   // ================================
