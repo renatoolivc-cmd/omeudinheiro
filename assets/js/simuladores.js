@@ -100,7 +100,37 @@
     return Math.max(5, 75 - idade);
   }
 
-  function bindAge(inputId, labelId) {
+  // Age → auto-set slider + label; slider also manually editable
+  function bindAgeSlider(ageId, sliderId, labelId) {
+    var ageInput = document.getElementById(ageId);
+    var slider = document.getElementById(sliderId);
+    var label = document.getElementById(labelId);
+    if (!ageInput || !slider || !label) return;
+
+    function updateLabel() {
+      var meses = parseInt(slider.value);
+      if (!meses || meses <= 0) { label.textContent = '—'; return; }
+      label.textContent = formatPrazo(meses);
+    }
+
+    // Age changes → auto-set slider to max prazo
+    ageInput.addEventListener('input', function () {
+      var idade = parseInt(ageInput.value);
+      if (isNaN(idade) || idade < 18) { slider.value = 0; label.textContent = '—'; return; }
+      var anos = calcPrazoFromAge(idade);
+      var maxMeses = anos * 12;
+      slider.max = maxMeses;
+      slider.value = maxMeses;
+      updateLabel();
+    });
+
+    // Slider changes → update label only
+    slider.addEventListener('input', updateLabel);
+    updateLabel();
+  }
+
+  // Simple age → label only (for "quanto posso comprar" which has no slider)
+  function bindAgeLabel(inputId, labelId) {
     var input = document.getElementById(inputId);
     var label = document.getElementById(labelId);
     if (!input || !label) return;
@@ -114,9 +144,9 @@
     update();
   }
 
-  bindAge('ch_idade', 'ch_prazo_auto');
-  bindAge('co_idade', 'co_prazo_auto');
-  bindAge('ef_idade', 'ef_prazo_auto');
+  bindAgeSlider('ch_idade', 'ch_prazo', 'ch_prazo_label');
+  bindAgeSlider('co_idade', 'co_prazo', 'co_prazo_label');
+  bindAgeLabel('ef_idade', 'ef_prazo_auto');
 
   // ================================
   // TAN values (fixed)
@@ -222,12 +252,13 @@
 
       var montante = val('ch_montante') || ((val('ch_imovel') || 0) - (val('ch_entrada') || 0));
       var idade = val('ch_idade');
+      var prazo = parseInt(document.getElementById('ch_prazo').value);
 
       if (!montante || montante <= 0) { showError(res, 'Por favor preenche o valor do imóvel e a entrada.'); return; }
       if (!idade || idade < 18) { showError(res, 'Por favor indica a idade da pessoa mais velha.'); return; }
+      if (!prazo || prazo <= 0) { showError(res, 'Por favor ajusta o prazo.'); return; }
 
-      var anos = calcPrazoFromAge(idade);
-      var prazo = anos * 12;
+      var anos = Math.floor(prazo / 12);
       var rm = (TAN.habitacao / 100) / 12;
       var prestacao = pmt(montante, rm, prazo);
       var total = prestacao * prazo;
@@ -329,8 +360,11 @@
         showError(res, 'Por favor indica a idade da pessoa mais velha.');
         return;
       }
-      var prazoAnos = calcPrazoFromAge(idade);
-      var prazo = prazoAnos * 12;
+      var prazo = parseInt(document.getElementById('co_prazo').value);
+      if (!prazo || prazo <= 0) {
+        showError(res, 'Por favor ajusta o prazo.');
+        return;
+      }
       if (temHab && (!habEmprestimo || habEmprestimo <= 0)) {
         showError(res, 'Por favor preenche o valor do empréstimo habitação.');
         return;

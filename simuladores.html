@@ -123,7 +123,9 @@
             <input type="number" id="ch_idade" min="18" max="70" step="1" placeholder="Ex: 32" required>
           </div>
           <div class="field">
-            <label>Prazo máximo: <span id="ch_prazo_auto" class="prazo-auto-label">—</span></label>
+            <label for="ch_prazo">Prazo: <span id="ch_prazo_label" class="prazo-auto-label">—</span></label>
+            <input type="range" id="ch_prazo" min="12" max="480" value="0" step="12" class="slider">
+            <small class="slider-hint">Ajustado automaticamente pela idade. Podes alterar manualmente.</small>
           </div>
           <div class="field">
             <label>TAN:</label>
@@ -196,7 +198,9 @@
             <input type="number" id="co_idade" min="18" max="70" step="1" placeholder="Ex: 32" required>
           </div>
           <div class="field">
-            <label>Prazo máximo: <span id="co_prazo_auto" class="prazo-auto-label">—</span></label>
+            <label for="co_prazo">Prazo: <span id="co_prazo_label" class="prazo-auto-label">—</span></label>
+            <input type="range" id="co_prazo" min="12" max="480" value="0" step="12" class="slider">
+            <small class="slider-hint">Ajustado automaticamente pela idade. Podes alterar manualmente.</small>
           </div>
           <div class="field">
             <label>TAN:</label>

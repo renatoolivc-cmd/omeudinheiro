@@ -105,6 +105,7 @@
   box-shadow: 0 2px 8px rgba(37,99,235,.35);
 }
 .slider:focus-visible { outline: 3px solid var(--cyan-400); }
+.slider-hint { display: block; margin-top: .4rem; font-size: .75rem; color: var(--gray-500); font-style: italic; }
 
 /* --- Toggle Group --- */
 .toggle-group {
