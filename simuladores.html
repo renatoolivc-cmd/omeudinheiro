@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Simuladores de crédito gratuitos: habitação, pessoal, automóvel, consolidação e taxa de esforço.">
+  <title>Simuladores de Crédito – omeudinheiro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/simuladores.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="omeudinheiro – Página inicial">
+        <span class="logo-icon">💰</span><span class="logo-text">omeu<strong>dinheiro</strong></span>
+      </a>
+      <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="main-nav" id="mainNav" aria-label="Navegação principal">
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="simuladores.html" class="active">Simuladores</a></li>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <h1>Simuladores de Crédito</h1>
+        <p>Todas as simulações são indicativas e não vinculativas. Os valores reais dependem da análise da entidade financeira.</p>
+      </div>
+    </section>
+
+    <div class="container sims-container">
+
+      <!-- TAXA DE ESFORÇO -->
+      <article class="sim-card" id="esforco">
+        <div class="sim-header">
+          <span class="sim-icon">📊</span>
+          <div>
+            <h2>Taxa de Esforço</h2>
+            <p>Descobre que percentagem do teu rendimento vai para prestações de crédito.</p>
+          </div>
+        </div>
+        <form class="sim-form" id="formEsforco" novalidate>
+          <div class="field">
+            <label for="ef_rendimento">Rendimento mensal líquido (€) *</label>
+            <input type="number" id="ef_rendimento" min="1" step="1" placeholder="Ex: 1200" required>
+          </div>
+          <div class="field">
+            <label for="ef_prestacoes">Total de prestações atuais (€) *</label>
+            <input type="number" id="ef_prestacoes" min="0" step="1" placeholder="Ex: 350" required>
+          </div>
+          <div class="field">
+            <label for="ef_nova">Nova prestação a adicionar (€)</label>
+            <input type="number" id="ef_nova" min="0" step="1" placeholder="Opcional">
+          </div>
+          <button type="submit" class="btn btn-primary">Calcular</button>
+          <div class="sim-result" id="resultEsforco" hidden></div>
+        </form>
+      </article>
+
+      <!-- CRÉDITO AUTOMÓVEL -->
+      <article class="sim-card" id="automovel">
+        <div class="sim-header">
+          <span class="sim-icon">🚗</span>
+          <div>
+            <h2>Crédito Automóvel</h2>
+            <p>Calcula a prestação mensal para o carro que queres comprar.</p>
+          </div>
+        </div>
+        <form class="sim-form" id="formAutomovel" novalidate>
+          <div class="field">
+            <label for="au_valor">Valor do carro (€) *</label>
+            <input type="number" id="au_valor" min="1" step="1" placeholder="Ex: 20000" required>
+          </div>
+          <div class="field">
+            <label for="au_entrada">Entrada inicial (€)</label>
+            <input type="number" id="au_entrada" min="0" step="1" placeholder="0" value="0">
+          </div>
+          <div class="field">
+            <label for="au_prazo">Prazo (meses) *</label>
+            <input type="number" id="au_prazo" min="6" max="120" step="1" placeholder="Ex: 60" required>
+          </div>
+          <div class="field">
+            <label for="au_taxa">Taxa anual – TAEG aprox. (%) *</label>
+            <input type="number" id="au_taxa" min="0" step="0.01" placeholder="Ex: 7.5" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Calcular</button>
+          <div class="sim-result" id="resultAutomovel" hidden></div>
+        </form>
+      </article>
+
+      <!-- CRÉDITO PESSOAL -->
+      <article class="sim-card" id="pessoal">
+        <div class="sim-header">
+          <span class="sim-icon">💳</span>
+          <div>
+            <h2>Crédito Pessoal</h2>
+            <p>Simula rapidamente o valor da prestação para o montante que precisas.</p>
+          </div>
+        </div>
+        <form class="sim-form" id="formPessoal" novalidate>
+          <div class="field">
+            <label for="cp_montante">Montante desejado (€) *</label>
+            <input type="number" id="cp_montante" min="1" step="1" placeholder="Ex: 5000" required>
+          </div>
+          <div class="field">
+            <label for="cp_prazo">Prazo (meses) *</label>
+            <input type="number" id="cp_prazo" min="6" max="120" step="1" placeholder="Ex: 48" required>
+          </div>
+          <div class="field">
+            <label for="cp_taxa">Taxa anual (%) *</label>
+            <input type="number" id="cp_taxa" min="0" step="0.01" placeholder="Ex: 9.5" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Calcular</button>
+          <div class="sim-result" id="resultPessoal" hidden></div>
+        </form>
+      </article>
+
+      <!-- CRÉDITO HABITAÇÃO -->
+      <article class="sim-card" id="habitacao">
+        <div class="sim-header">
+          <span class="sim-icon">🏠</span>
+          <div>
+            <h2>Crédito Habitação</h2>
+            <p>Descobre quanto vais pagar por mês pela tua casa.</p>
+          </div>
+        </div>
+        <form class="sim-form" id="formHabitacao" novalidate>
+          <div class="field">
+            <label for="ch_imovel">Valor do imóvel (€) *</label>
+            <input type="number" id="ch_imovel" min="1" step="1" placeholder="Ex: 200000" required>
+          </div>
+          <div class="field">
+            <label for="ch_entrada">Entrada inicial (€) *</label>
+            <input type="number" id="ch_entrada" min="0" step="1" placeholder="Ex: 40000" required>
+          </div>
+          <div class="field">
+            <label for="ch_montante">Montante a financiar (€)</label>
+            <input type="number" id="ch_montante" min="0" step="1" placeholder="Calculado automaticamente">
+          </div>
+          <div class="field">
+            <label for="ch_prazo">Prazo (anos) *</label>
+            <input type="number" id="ch_prazo" min="5" max="40" step="1" placeholder="Ex: 30" required>
+          </div>
+          <div class="field">
+            <label for="ch_taxa">Taxa anual indicativa (%) *</label>
+            <input type="number" id="ch_taxa" min="0" step="0.01" placeholder="Ex: 3.5" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Calcular</button>
+          <div class="sim-result" id="resultHabitacao" hidden></div>
+        </form>
+      </article>
+
+      <!-- CONSOLIDAÇÃO -->
+      <article class="sim-card" id="consolidacao">
+        <div class="sim-header">
+          <span class="sim-icon">🔄</span>
+          <div>
+            <h2>Consolidação de Créditos</h2>
+            <p>Junta vários créditos num só e descobre se consegues pagar menos por mês.</p>
+          </div>
+        </div>
+        <form class="sim-form" id="formConsolidacao" novalidate>
+          <fieldset class="credit-group">
+            <legend>Créditos atuais</legend>
+            <div class="credit-row">
+              <h4>Crédito 1</h4>
+              <div class="field">
+                <label for="co_m1">Montante em dívida (€) *</label>
+                <input type="number" id="co_m1" min="0" step="1" placeholder="Ex: 5000" required>
+              </div>
+              <div class="field">
+                <label for="co_p1">Prestação mensal (€) *</label>
+                <input type="number" id="co_p1" min="0" step="1" placeholder="Ex: 150" required>
+              </div>
+            </div>
+            <div class="credit-row">
+              <h4>Crédito 2</h4>
+              <div class="field">
+                <label for="co_m2">Montante em dívida (€)</label>
+                <input type="number" id="co_m2" min="0" step="1" placeholder="0">
+              </div>
+              <div class="field">
+                <label for="co_p2">Prestação mensal (€)</label>
+                <input type="number" id="co_p2" min="0" step="1" placeholder="0">
+              </div>
+            </div>
+            <div class="credit-row">
+              <h4>Crédito 3</h4>
+              <div class="field">
+                <label for="co_m3">Montante em dívida (€)</label>
+                <input type="number" id="co_m3" min="0" step="1" placeholder="0">
+              </div>
+              <div class="field">
+                <label for="co_p3">Prestação mensal (€)</label>
+                <input type="number" id="co_p3" min="0" step="1" placeholder="0">
+              </div>
+            </div>
+          </fieldset>
+          <fieldset class="credit-group">
+            <legend>Novo crédito consolidado</legend>
+            <div class="field">
+              <label for="co_taxa_nova">Taxa anual do novo crédito (%) *</label>
+              <input type="number" id="co_taxa_nova" min="0" step="0.01" placeholder="Ex: 8" required>
+            </div>
+            <div class="field">
+              <label for="co_prazo_novo">Novo prazo (meses) *</label>
+              <input type="number" id="co_prazo_novo" min="6" step="1" placeholder="Ex: 84" required>
+            </div>
+          </fieldset>
+          <button type="submit" class="btn btn-primary">Calcular</button>
+          <div class="sim-result" id="resultConsolidacao" hidden></div>
+        </form>
+      </article>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-links">
+        <a href="index.html">Início</a>
+        <a href="simuladores.html">Simuladores</a>
+        <a href="sobre.html">Sobre</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+      <p class="footer-disclaimer">As simulações apresentadas são meramente indicativas e não constituem propostas de crédito nem garantias de aprovação.</p>
+      <p class="footer-copy">© 2026 omeudinheiro – Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/simuladores.js"></script>
+</body>
+</html>
