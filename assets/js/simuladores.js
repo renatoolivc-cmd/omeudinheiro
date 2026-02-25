@@ -116,6 +116,7 @@
 
   bindAge('ch_idade', 'ch_prazo_auto');
   bindAge('co_idade', 'co_prazo_auto');
+  bindAge('ef_idade', 'ef_prazo_auto');
 
   // ================================
   // TAN values (fixed)
@@ -395,8 +396,52 @@
   }
 
   // ================================
-  // 5) Taxa de Esforço
+  // 5) Até que valor posso comprar casa?
   // ================================
+  // Toggles
+  var efPrestSim = document.getElementById('ef_prest_sim');
+  var efPrestNao = document.getElementById('ef_prest_nao');
+  var efPrestField = document.getElementById('ef_prest_field');
+  if (efPrestSim && efPrestNao && efPrestField) {
+    efPrestSim.addEventListener('change', function () { efPrestField.hidden = false; });
+    efPrestNao.addEventListener('change', function () { efPrestField.hidden = true; });
+  }
+  var efFilhosSim = document.getElementById('ef_filhos_sim');
+  var efFilhosNao = document.getElementById('ef_filhos_nao');
+  var efFilhosField = document.getElementById('ef_filhos_field');
+  if (efFilhosSim && efFilhosNao && efFilhosField) {
+    efFilhosSim.addEventListener('change', function () { efFilhosField.hidden = false; });
+    efFilhosNao.addEventListener('change', function () { efFilhosField.hidden = true; });
+  }
+
+  // Lead form handler (reusable)
+  function handleLeadFormById(formId, feedbackId) {
+    var form = document.getElementById(formId);
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var inputs = form.querySelectorAll('input[required]');
+      var feedback = document.getElementById(feedbackId);
+      var valid = true;
+      inputs.forEach(function (f) { f.classList.remove('error'); });
+      inputs.forEach(function (f) {
+        if (!f.value.trim()) { f.classList.add('error'); valid = false; }
+        if (f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value)) { f.classList.add('error'); valid = false; }
+      });
+      if (!valid) {
+        feedback.hidden = false;
+        feedback.className = 'form-feedback error';
+        feedback.textContent = 'Por favor preenche todos os campos corretamente.';
+        return;
+      }
+      var nome = form.querySelector('input[type="text"]');
+      feedback.hidden = false;
+      feedback.className = 'form-feedback success';
+      feedback.textContent = '✅ Obrigado' + (nome ? ', ' + nome.value.trim() : '') + '! Vamos enviar-te uma proposta personalizada em breve.';
+      form.reset();
+    });
+  }
+
   var fEsforco = document.getElementById('formEsforco');
   if (fEsforco) {
     fEsforco.addEventListener('submit', function (e) {
@@ -404,31 +449,67 @@
       var res = document.getElementById('resultEsforco');
       clearResult('resultEsforco');
 
+      var idade = val('ef_idade');
       var rendimento = val('ef_rendimento');
-      var prestacoes = val('ef_prestacoes');
+      var temPrestacoes = efPrestSim && efPrestSim.checked;
+      var prestacoes = temPrestacoes ? (val('ef_prestacoes') || 0) : 0;
+      var temFilhos = efFilhosSim && efFilhosSim.checked;
+      var nFilhos = temFilhos ? (val('ef_filhos') || 0) : 0;
+      var custoFilhos = nFilhos * 50;
 
-      if (!rendimento || rendimento <= 0 || prestacoes === null || prestacoes < 0) {
-        showError(res, 'Por favor preenche todos os campos obrigatórios.');
+      if (!idade || idade < 18) { showError(res, 'Por favor indica a idade.'); return; }
+      if (!rendimento || rendimento <= 0) { showError(res, 'Por favor indica o rendimento mensal.'); return; }
+
+      // Prazo
+      var prazoAnos = calcPrazoFromAge(idade);
+      var prazoMeses = prazoAnos * 12;
+
+      // Taxa de esforço de 50%: prestação máxima para habitação
+      var maxTotalPrestacao = rendimento * 0.50;
+      var prestacaoMaxHabitacao = maxTotalPrestacao - prestacoes - custoFilhos;
+
+      if (prestacaoMaxHabitacao <= 0) {
+        showError(res, 'Com as tuas despesas atuais, não há margem para uma prestação de habitação a 50% de taxa de esforço.');
         return;
       }
 
-      var taxa = (prestacoes / rendimento) * 100;
-      var badge, badgeClass, msg;
-
-      if (taxa < 50) {
-        badge = '✅ ' + fmt(taxa).replace(/\s/g, '') + ' % — zona aceitável';
-        badgeClass = 'badge-green';
+      // Reverse PMT: from prestação → montante máximo
+      var rm = (TAN.habitacao / 100) / 12;
+      var montanteMax;
+      if (rm === 0) {
+        montanteMax = prestacaoMaxHabitacao * prazoMeses;
       } else {
-        badge = '🚨 ' + fmt(taxa).replace(/\s/g, '') + ' % — atenção: esforço muito elevado';
-        badgeClass = 'badge-red';
+        var x = Math.pow(1 + rm, prazoMeses);
+        montanteMax = prestacaoMaxHabitacao * (x - 1) / (rm * x);
       }
 
+      var taxaEsforco = ((prestacoes + custoFilhos + prestacaoMaxHabitacao) / rendimento) * 100;
+
       var html = '<h3>Resultado</h3>';
-      html += '<div class="result-row highlight-row"><span>Taxa de esforço</span><span>' + taxa.toFixed(1).replace('.', ',') + ' %</span></div>';
-      html += '<div class="result-badge ' + badgeClass + '">' + badge + '</div>';
+      html += '<div class="result-row"><span>Prazo máximo</span><span>' + prazoAnos + ' anos</span></div>';
+      html += '<div class="result-row"><span>Rendimento mensal</span><span>' + fmt(rendimento) + ' €</span></div>';
+      if (prestacoes > 0) html += '<div class="result-row"><span>Outras prestações</span><span>' + fmt(prestacoes) + ' €/mês</span></div>';
+      if (custoFilhos > 0) html += '<div class="result-row"><span>Custo filhos (' + nFilhos + ')</span><span>' + fmt(custoFilhos) + ' €/mês</span></div>';
+      html += '<div class="result-row highlight-row"><span>Prestação máxima habitação</span><span>' + fmt(prestacaoMaxHabitacao) + ' €/mês</span></div>';
+      html += '<div class="result-row highlight-row"><span>Valor máximo do imóvel (financiamento)</span><span>' + fmt(montanteMax) + ' €</span></div>';
+      html += '<div class="result-row"><span>Taxa de esforço</span><span class="result-badge badge-green" style="margin:0;padding:.25rem .75rem">50,0 %</span></div>';
+      html += '<p class="result-note">⚠️ Cálculo baseado numa TAN indicativa de ' + TAN.habitacao.toFixed(2).replace('.', ',') + '% a ' + prazoAnos + ' anos. O valor do imóvel pode ser superior se deres uma entrada inicial. Simulação não vinculativa.</p>';
+
+      // Lead form
+      html += '<div class="lead-form-box">';
+      html += '<h3>📩 Receber proposta personalizada</h3>';
+      html += '<p>Deixa os teus dados e um especialista entrará em contacto contigo.</p>';
+      html += '<form id="leadFormEsforco" novalidate>';
+      html += '<div class="field"><label for="lead2_nome">Nome *</label><input type="text" id="lead2_nome" placeholder="O teu nome" required></div>';
+      html += '<div class="field"><label for="lead2_tel">Telefone *</label><input type="tel" id="lead2_tel" placeholder="Ex: 912345678" required></div>';
+      html += '<div class="field"><label for="lead2_email">Email *</label><input type="email" id="lead2_email" placeholder="email@exemplo.com" required></div>';
+      html += '<button type="submit" class="btn btn-primary">Enviar pedido</button>';
+      html += '<div class="form-feedback" id="leadFeedbackEsforco" hidden></div>';
+      html += '</form></div>';
 
       res.hidden = false;
       res.innerHTML = html;
+      handleLeadFormById('leadFormEsforco', 'leadFeedbackEsforco');
     });
   }
 

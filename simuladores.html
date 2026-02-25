@@ -61,8 +61,8 @@
           </button>
           <button class="sim-menu-card" data-open="esforco">
             <span class="sim-menu-icon">📊</span>
-            <h3>Taxa de Esforço</h3>
-            <p>Verifica se as tuas prestações estão dentro de limites saudáveis.</p>
+            <h3>Quanto posso pagar?</h3>
+            <p>Descobre o valor máximo de casa que podes comprar.</p>
           </button>
         </div>
       </div>
@@ -207,24 +207,49 @@
         </form>
       </article>
 
-      <!-- TAXA DE ESFORÇO -->
+      <!-- ATÉ QUE VALOR POSSO COMPRAR CASA? -->
       <article class="sim-card sim-panel" id="panel-esforco" hidden>
         <button class="sim-back" aria-label="Voltar ao menu">← Voltar aos simuladores</button>
         <div class="sim-header">
           <span class="sim-icon">📊</span>
           <div>
-            <h2>Taxa de Esforço</h2>
-            <p>Descobre que percentagem do teu rendimento vai para prestações de crédito.</p>
+            <h2>Até que valor posso comprar casa?</h2>
+            <p>Descobre o valor máximo de imóvel que podes financiar com base no teu rendimento.</p>
           </div>
         </div>
         <form class="sim-form" id="formEsforco" novalidate>
           <div class="field">
-            <label for="ef_rendimento">Rendimento mensal líquido (€) *</label>
-            <input type="number" id="ef_rendimento" min="1" step="1" placeholder="Ex: 1200" required>
+            <label for="ef_idade">Idade da pessoa mais velha *</label>
+            <input type="number" id="ef_idade" min="18" max="70" step="1" placeholder="Ex: 32" required>
           </div>
           <div class="field">
-            <label for="ef_prestacoes">Total de prestações mensais atuais (€) *</label>
-            <input type="number" id="ef_prestacoes" min="0" step="1" placeholder="Ex: 350" required>
+            <label>Prazo máximo: <span id="ef_prazo_auto" class="prazo-auto-label">—</span></label>
+          </div>
+          <div class="field">
+            <label>Tem outras prestações mensais? *</label>
+            <div class="toggle-group">
+              <label class="toggle-option"><input type="radio" name="ef_prestacoes_toggle" value="sim" id="ef_prest_sim"> Sim</label>
+              <label class="toggle-option"><input type="radio" name="ef_prestacoes_toggle" value="nao" id="ef_prest_nao" checked> Não</label>
+            </div>
+          </div>
+          <div class="field" id="ef_prest_field" hidden>
+            <label for="ef_prestacoes">Valor mensal das outras prestações (€) *</label>
+            <input type="number" id="ef_prestacoes" min="0" step="1" placeholder="Ex: 250">
+          </div>
+          <div class="field">
+            <label>Tem filhos? *</label>
+            <div class="toggle-group">
+              <label class="toggle-option"><input type="radio" name="ef_filhos_toggle" value="sim" id="ef_filhos_sim"> Sim</label>
+              <label class="toggle-option"><input type="radio" name="ef_filhos_toggle" value="nao" id="ef_filhos_nao" checked> Não</label>
+            </div>
+          </div>
+          <div class="field" id="ef_filhos_field" hidden>
+            <label for="ef_filhos">Quantos filhos?</label>
+            <input type="number" id="ef_filhos" min="1" max="20" step="1" placeholder="Ex: 2">
+          </div>
+          <div class="field">
+            <label for="ef_rendimento">Rendimento mensal líquido (€) *</label>
+            <input type="number" id="ef_rendimento" min="1" step="1" placeholder="Ex: 1500" required>
           </div>
           <button type="submit" class="btn btn-primary">Calcular</button>
           <div class="sim-result" id="resultEsforco" hidden></div>
