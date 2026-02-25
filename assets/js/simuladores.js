@@ -92,8 +92,30 @@
 
   bindSlider('au_prazo', 'au_prazo_label');
   bindSlider('cp_prazo', 'cp_prazo_label');
-  bindSlider('ch_prazo', 'ch_prazo_label');
-  bindSlider('co_prazo', 'co_prazo_label');
+  // --- Age → Prazo calculation ---
+  function calcPrazoFromAge(idade) {
+    if (idade <= 30) return 40;
+    if (idade <= 35) return 37;
+    if (idade <= 40) return 37;
+    return Math.max(5, 75 - idade);
+  }
+
+  function bindAge(inputId, labelId) {
+    var input = document.getElementById(inputId);
+    var label = document.getElementById(labelId);
+    if (!input || !label) return;
+    function update() {
+      var idade = parseInt(input.value);
+      if (isNaN(idade) || idade < 18) { label.textContent = '—'; return; }
+      var anos = calcPrazoFromAge(idade);
+      label.textContent = anos + ' anos (' + (anos * 12) + ' meses)';
+    }
+    input.addEventListener('input', update);
+    update();
+  }
+
+  bindAge('ch_idade', 'ch_prazo_auto');
+  bindAge('co_idade', 'co_prazo_auto');
 
   // ================================
   // TAN values (fixed)
@@ -198,15 +220,17 @@
       clearResult('resultHabitacao');
 
       var montante = val('ch_montante') || ((val('ch_imovel') || 0) - (val('ch_entrada') || 0));
-      var prazo = parseInt(document.getElementById('ch_prazo').value);
+      var idade = val('ch_idade');
 
       if (!montante || montante <= 0) { showError(res, 'Por favor preenche o valor do imóvel e a entrada.'); return; }
+      if (!idade || idade < 18) { showError(res, 'Por favor indica a idade da pessoa mais velha.'); return; }
 
+      var anos = calcPrazoFromAge(idade);
+      var prazo = anos * 12;
       var rm = (TAN.habitacao / 100) / 12;
       var prestacao = pmt(montante, rm, prazo);
       var total = prestacao * prazo;
       var juros = total - montante;
-      var anos = Math.floor(prazo / 12);
 
       var html = '<h3>Resultado</h3>';
       html += '<div class="result-row"><span>Montante financiado</span><span>' + fmt(montante) + ' €</span></div>';
@@ -285,7 +309,7 @@
       var outrosPrestacoes = val('co_total_prestacoes') || 0;
       var extra = (extraSim && extraSim.checked) ? (val('co_extra_valor') || 0) : 0;
       var rendimento = val('co_rendimento');
-      var prazo = parseInt(document.getElementById('co_prazo').value);
+      var idade = val('co_idade');
 
       // Validation
       if (outrosDivida <= 0 && habEmprestimo <= 0) {
@@ -300,10 +324,12 @@
         showError(res, 'Por favor preenche o rendimento mensal.');
         return;
       }
-      if (prazo <= 0) {
-        showError(res, 'Por favor seleciona o prazo no slider.');
+      if (!idade || idade < 18) {
+        showError(res, 'Por favor indica a idade da pessoa mais velha.');
         return;
       }
+      var prazoAnos = calcPrazoFromAge(idade);
+      var prazo = prazoAnos * 12;
       if (temHab && (!habEmprestimo || habEmprestimo <= 0)) {
         showError(res, 'Por favor preenche o valor do empréstimo habitação.');
         return;

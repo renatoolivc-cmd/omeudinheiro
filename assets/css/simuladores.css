@@ -77,6 +77,13 @@
   letter-spacing: .02em;
 }
 
+/* --- Prazo auto label --- */
+.prazo-auto-label {
+  display: inline-block; padding: .35rem .75rem;
+  background: var(--blue-50); border-radius: 8px;
+  color: var(--blue-700); font-weight: 700; font-size: .95rem;
+}
+
 /* --- Slider --- */
 .slider {
   -webkit-appearance: none; appearance: none;
