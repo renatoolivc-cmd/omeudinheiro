@@ -124,7 +124,7 @@
   var TAN = {
     automovel: 8.10,
     pessoal: 8.60,
-    habitacao: 2.60,
+    habitacao: 2.50,
     consolidacao: 2.60
   };
 
