@@ -26,81 +26,86 @@
     container.innerHTML = '<div class="sim-error">' + msg + '</div>';
   }
 
-  function clearError(id) {
+  function clearResult(id) {
     var el = document.getElementById(id);
     el.hidden = true;
     el.innerHTML = '';
   }
 
-  // ================================
-  // 1) Taxa de Esforço
-  // ================================
-  var fEsforco = document.getElementById('formEsforco');
-  if (fEsforco) {
-    fEsforco.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var res = document.getElementById('resultEsforco');
-      clearError('resultEsforco');
-
-      var rendimento = val('ef_rendimento');
-      var prestacoes = val('ef_prestacoes');
-      var nova = val('ef_nova') || 0;
-
-      if (!rendimento || rendimento <= 0 || prestacoes === null || prestacoes < 0) {
-        showError(res, 'Por favor preenche todos os campos obrigatórios.');
-        return;
-      }
-
-      var taxaAtual = (prestacoes / rendimento) * 100;
-      var taxaComNova = ((prestacoes + nova) / rendimento) * 100;
-
-      var badge, badgeClass;
-      var taxaFinal = nova > 0 ? taxaComNova : taxaAtual;
-      if (taxaFinal < 30) { badge = '✅ Zona segura'; badgeClass = 'badge-green'; }
-      else if (taxaFinal <= 40) { badge = '⚠️ Atenção: limite recomendado'; badgeClass = 'badge-yellow'; }
-      else { badge = '🚨 Risco elevado, taxa de esforço alta'; badgeClass = 'badge-red'; }
-
-      var html = '<h3>Resultado</h3>';
-      html += '<div class="result-row highlight-row"><span>Taxa de esforço atual</span><span>' + fmt(taxaAtual) + ' %</span></div>';
-      if (nova > 0) {
-        html += '<div class="result-row highlight-row"><span>Taxa de esforço com novo crédito</span><span>' + fmt(taxaComNova) + ' %</span></div>';
-      }
-      html += '<div class="result-badge ' + badgeClass + '">' + badge + '</div>';
-
-      res.hidden = false;
-      res.innerHTML = html;
-    });
+  function formatPrazo(meses) {
+    var anos = Math.floor(meses / 12);
+    var resto = meses % 12;
+    var txt = meses + ' meses';
+    if (anos > 0 && resto === 0) txt += ' (' + anos + (anos === 1 ? ' ano' : ' anos') + ')';
+    else if (anos > 0) txt += ' (' + anos + (anos === 1 ? ' ano' : ' anos') + ' e ' + resto + (resto === 1 ? ' mês' : ' meses') + ')';
+    return txt;
   }
 
   // ================================
-  // 2) Crédito Automóvel
+  // TABS
+  // ================================
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  var panels = document.querySelectorAll('.tab-panel');
+
+  tabBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabBtns.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function (p) { p.classList.remove('active'); p.hidden = true; });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      var panel = document.getElementById('panel-' + btn.dataset.tab);
+      if (panel) { panel.classList.add('active'); panel.hidden = false; }
+    });
+  });
+
+  // ================================
+  // SLIDERS — live label updates
+  // ================================
+  function bindSlider(sliderId, labelId) {
+    var slider = document.getElementById(sliderId);
+    var label = document.getElementById(labelId);
+    if (!slider || !label) return;
+    function update() { label.textContent = formatPrazo(parseInt(slider.value)); }
+    slider.addEventListener('input', update);
+    update();
+  }
+
+  bindSlider('au_prazo', 'au_prazo_label');
+  bindSlider('cp_prazo', 'cp_prazo_label');
+  bindSlider('ch_prazo', 'ch_prazo_label');
+  bindSlider('co_prazo', 'co_prazo_label');
+
+  // ================================
+  // TAN values (fixed)
+  // ================================
+  var TAN = {
+    automovel: 8.10,
+    pessoal: 8.60,
+    habitacao: 2.60,
+    consolidacao: 2.60
+  };
+
+  // ================================
+  // 1) Crédito Automóvel
   // ================================
   var fAuto = document.getElementById('formAutomovel');
   if (fAuto) {
     fAuto.addEventListener('submit', function (e) {
       e.preventDefault();
       var res = document.getElementById('resultAutomovel');
-      clearError('resultAutomovel');
+      clearResult('resultAutomovel');
 
       var valor = val('au_valor');
       var entrada = val('au_entrada') || 0;
-      var prazo = val('au_prazo');
-      var taxa = val('au_taxa');
+      var prazo = parseInt(document.getElementById('au_prazo').value);
 
-      if (!valor || valor <= 0 || !prazo || prazo <= 0 || taxa === null || taxa < 0) {
-        showError(res, 'Por favor preenche todos os campos obrigatórios.');
-        return;
-      }
-      if (entrada >= valor) {
-        showError(res, 'A entrada não pode ser igual ou superior ao valor do carro.');
-        return;
-      }
+      if (!valor || valor <= 0) { showError(res, 'Por favor preenche o valor do carro.'); return; }
+      if (entrada >= valor) { showError(res, 'A entrada não pode ser igual ou superior ao valor do carro.'); return; }
 
       var montante = valor - entrada;
-      var rm = (taxa / 100) / 12;
-      var n = Math.round(prazo);
-      var prestacao = pmt(montante, rm, n);
-      var total = prestacao * n;
+      var rm = (TAN.automovel / 100) / 12;
+      var prestacao = pmt(montante, rm, prazo);
+      var total = prestacao * prazo;
       var juros = total - montante;
 
       var html = '<h3>Resultado</h3>';
@@ -108,7 +113,7 @@
       html += '<div class="result-row highlight-row"><span>Prestação mensal</span><span>' + fmt(prestacao) + ' €</span></div>';
       html += '<div class="result-row"><span>Total pago</span><span>' + fmt(total) + ' €</span></div>';
       html += '<div class="result-row"><span>Total de juros</span><span>' + fmt(juros) + ' €</span></div>';
-      html += '<p class="result-note">Valores aproximados. A TAEG real depende da entidade financeira.</p>';
+      html += '<p class="result-note">TAN fixa de ' + TAN.automovel.toFixed(2).replace('.', ',') + '%. Valores aproximados — consulta a entidade financeira.</p>';
 
       res.hidden = false;
       res.innerHTML = html;
@@ -116,35 +121,30 @@
   }
 
   // ================================
-  // 3) Crédito Pessoal
+  // 2) Crédito Pessoal
   // ================================
   var fPessoal = document.getElementById('formPessoal');
   if (fPessoal) {
     fPessoal.addEventListener('submit', function (e) {
       e.preventDefault();
       var res = document.getElementById('resultPessoal');
-      clearError('resultPessoal');
+      clearResult('resultPessoal');
 
       var montante = val('cp_montante');
-      var prazo = val('cp_prazo');
-      var taxa = val('cp_taxa');
+      var prazo = parseInt(document.getElementById('cp_prazo').value);
 
-      if (!montante || montante <= 0 || !prazo || prazo <= 0 || taxa === null || taxa < 0) {
-        showError(res, 'Por favor preenche todos os campos obrigatórios.');
-        return;
-      }
+      if (!montante || montante <= 0) { showError(res, 'Por favor preenche o montante desejado.'); return; }
 
-      var rm = (taxa / 100) / 12;
-      var n = Math.round(prazo);
-      var prestacao = pmt(montante, rm, n);
-      var total = prestacao * n;
+      var rm = (TAN.pessoal / 100) / 12;
+      var prestacao = pmt(montante, rm, prazo);
+      var total = prestacao * prazo;
       var juros = total - montante;
 
       var html = '<h3>Resultado</h3>';
       html += '<div class="result-row highlight-row"><span>Prestação mensal</span><span>' + fmt(prestacao) + ' €</span></div>';
       html += '<div class="result-row"><span>Total pago</span><span>' + fmt(total) + ' €</span></div>';
       html += '<div class="result-row"><span>Total de juros</span><span>' + fmt(juros) + ' €</span></div>';
-      html += '<p class="result-note">Valores aproximados. Consulta as condições da entidade financeira.</p>';
+      html += '<p class="result-note">TAN fixa de ' + TAN.pessoal.toFixed(2).replace('.', ',') + '%. Valores aproximados.</p>';
 
       res.hidden = false;
       res.innerHTML = html;
@@ -152,9 +152,8 @@
   }
 
   // ================================
-  // 4) Crédito Habitação
+  // 3) Crédito Habitação
   // ================================
-  // Auto-calculate montante
   var chImovel = document.getElementById('ch_imovel');
   var chEntrada = document.getElementById('ch_entrada');
   var chMontante = document.getElementById('ch_montante');
@@ -176,29 +175,25 @@
     fHab.addEventListener('submit', function (e) {
       e.preventDefault();
       var res = document.getElementById('resultHabitacao');
-      clearError('resultHabitacao');
+      clearResult('resultHabitacao');
 
       var montante = val('ch_montante') || ((val('ch_imovel') || 0) - (val('ch_entrada') || 0));
-      var prazoAnos = val('ch_prazo');
-      var taxa = val('ch_taxa');
+      var prazo = parseInt(document.getElementById('ch_prazo').value);
 
-      if (!montante || montante <= 0 || !prazoAnos || prazoAnos <= 0 || taxa === null || taxa < 0) {
-        showError(res, 'Por favor preenche todos os campos obrigatórios.');
-        return;
-      }
+      if (!montante || montante <= 0) { showError(res, 'Por favor preenche o valor do imóvel e a entrada.'); return; }
 
-      var rm = (taxa / 100) / 12;
-      var n = Math.round(prazoAnos * 12);
-      var prestacao = pmt(montante, rm, n);
-      var total = prestacao * n;
+      var rm = (TAN.habitacao / 100) / 12;
+      var prestacao = pmt(montante, rm, prazo);
+      var total = prestacao * prazo;
       var juros = total - montante;
+      var anos = Math.floor(prazo / 12);
 
       var html = '<h3>Resultado</h3>';
       html += '<div class="result-row"><span>Montante financiado</span><span>' + fmt(montante) + ' €</span></div>';
       html += '<div class="result-row highlight-row"><span>Prestação mensal</span><span>' + fmt(prestacao) + ' €</span></div>';
-      html += '<div class="result-row"><span>Total pago (' + prazoAnos + ' anos)</span><span>' + fmt(total) + ' €</span></div>';
+      html += '<div class="result-row"><span>Total pago (' + anos + ' anos)</span><span>' + fmt(total) + ' €</span></div>';
       html += '<div class="result-row"><span>Total de juros</span><span>' + fmt(juros) + ' €</span></div>';
-      html += '<p class="result-note">⚠️ Taxa meramente indicativa. As condições reais dependem da avaliação bancária, spread, Euribor e outros fatores.</p>';
+      html += '<p class="result-note">⚠️ TAN indicativa de ' + TAN.habitacao.toFixed(2).replace('.', ',') + '%. As condições reais dependem da avaliação bancária, spread, Euribor e outros fatores.</p>';
 
       res.hidden = false;
       res.innerHTML = html;
@@ -206,53 +201,94 @@
   }
 
   // ================================
-  // 5) Consolidação de Créditos
+  // 4) Consolidação de Créditos
   // ================================
+  // Toggle "dinheiro extra"
+  var extraSim = document.getElementById('co_extra_sim');
+  var extraNao = document.getElementById('co_extra_nao');
+  var extraField = document.getElementById('co_extra_field');
+  if (extraSim && extraNao && extraField) {
+    extraSim.addEventListener('change', function () { extraField.hidden = false; });
+    extraNao.addEventListener('change', function () { extraField.hidden = true; });
+  }
+
   var fCons = document.getElementById('formConsolidacao');
   if (fCons) {
     fCons.addEventListener('submit', function (e) {
       e.preventDefault();
       var res = document.getElementById('resultConsolidacao');
-      clearError('resultConsolidacao');
+      clearResult('resultConsolidacao');
 
-      var m1 = val('co_m1') || 0;
-      var p1 = val('co_p1') || 0;
-      var m2 = val('co_m2') || 0;
-      var p2 = val('co_p2') || 0;
-      var m3 = val('co_m3') || 0;
-      var p3 = val('co_p3') || 0;
-      var taxaNova = val('co_taxa_nova');
-      var prazoNovo = val('co_prazo_novo');
+      var totalDivida = val('co_total_divida');
+      var totalPrestacoes = val('co_total_prestacoes');
+      var extra = 0;
+      if (extraSim && extraSim.checked) { extra = val('co_extra_valor') || 0; }
+      var prazo = parseInt(document.getElementById('co_prazo').value);
 
-      var somaMontantes = m1 + m2 + m3;
-      var somaPrestacoes = p1 + p2 + p3;
-
-      if (somaMontantes <= 0 || somaPrestacoes <= 0 || taxaNova === null || taxaNova < 0 || !prazoNovo || prazoNovo <= 0) {
-        showError(res, 'Por favor preenche pelo menos um crédito e os dados do novo crédito consolidado.');
+      if (!totalDivida || totalDivida <= 0 || !totalPrestacoes || totalPrestacoes <= 0) {
+        showError(res, 'Por favor preenche o valor total dos créditos e das prestações.');
         return;
       }
 
-      var rm = (taxaNova / 100) / 12;
-      var n = Math.round(prazoNovo);
-      var prestacaoNova = pmt(somaMontantes, rm, n);
-      var diferenca = somaPrestacoes - prestacaoNova;
-      var totalNovo = prestacaoNova * n;
-      var jurosNovos = totalNovo - somaMontantes;
+      var montante = totalDivida + extra;
+      var rm = (TAN.consolidacao / 100) / 12;
+      var prestacaoNova = pmt(montante, rm, prazo);
+      var diferenca = totalPrestacoes - prestacaoNova;
+      var totalNovo = prestacaoNova * prazo;
+      var juros = totalNovo - montante;
 
       var html = '<h3>Resultado</h3>';
-      html += '<div class="result-row"><span>Dívida total consolidada</span><span>' + fmt(somaMontantes) + ' €</span></div>';
-      html += '<div class="result-row"><span>Prestações atuais (soma)</span><span>' + fmt(somaPrestacoes) + ' €/mês</span></div>';
-      html += '<div class="result-row highlight-row"><span>Nova prestação consolidada</span><span>' + fmt(prestacaoNova) + ' €/mês</span></div>';
+      html += '<div class="result-row"><span>Montante a consolidar</span><span>' + fmt(montante) + ' €</span></div>';
+      html += '<div class="result-row"><span>Prestação atual total</span><span>' + fmt(totalPrestacoes) + ' €/mês</span></div>';
+      html += '<div class="result-row highlight-row"><span>Nova prestação estimada</span><span>' + fmt(prestacaoNova) + ' €/mês</span></div>';
 
       if (diferenca > 0) {
-        html += '<div class="result-row"><span>Poupança mensal</span><span style="color:#166534;font-weight:700">- ' + fmt(diferenca) + ' €</span></div>';
+        html += '<div class="result-row"><span>Poupança mensal estimada</span><span style="color:#166534;font-weight:700">- ' + fmt(diferenca) + ' €</span></div>';
       } else if (diferenca < 0) {
         html += '<div class="result-row"><span>Aumento mensal</span><span style="color:#991b1b;font-weight:700">+ ' + fmt(Math.abs(diferenca)) + ' €</span></div>';
       }
 
       html += '<div class="result-row"><span>Total pago (novo crédito)</span><span>' + fmt(totalNovo) + ' €</span></div>';
-      html += '<div class="result-row"><span>Total de juros (novo crédito)</span><span>' + fmt(jurosNovos) + ' €</span></div>';
-      html += '<p class="result-note">⚠️ Atenção: consolidar créditos com um prazo mais longo pode reduzir a prestação mensal, mas aumentar o total de juros pagos.</p>';
+      html += '<div class="result-row"><span>Total de juros</span><span>' + fmt(juros) + ' €</span></div>';
+      html += '<p class="result-note">⚠️ TAN indicativa de ' + TAN.consolidacao.toFixed(2).replace('.', ',') + '%. Simulação indicativa, não constitui proposta vinculativa. O aumento do prazo pode significar mais juros no total.</p>';
+
+      res.hidden = false;
+      res.innerHTML = html;
+    });
+  }
+
+  // ================================
+  // 5) Taxa de Esforço
+  // ================================
+  var fEsforco = document.getElementById('formEsforco');
+  if (fEsforco) {
+    fEsforco.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var res = document.getElementById('resultEsforco');
+      clearResult('resultEsforco');
+
+      var rendimento = val('ef_rendimento');
+      var prestacoes = val('ef_prestacoes');
+
+      if (!rendimento || rendimento <= 0 || prestacoes === null || prestacoes < 0) {
+        showError(res, 'Por favor preenche todos os campos obrigatórios.');
+        return;
+      }
+
+      var taxa = (prestacoes / rendimento) * 100;
+      var badge, badgeClass, msg;
+
+      if (taxa < 50) {
+        badge = '✅ ' + fmt(taxa).replace(/\s/g, '') + ' % — zona aceitável';
+        badgeClass = 'badge-green';
+      } else {
+        badge = '🚨 ' + fmt(taxa).replace(/\s/g, '') + ' % — atenção: esforço muito elevado';
+        badgeClass = 'badge-red';
+      }
+
+      var html = '<h3>Resultado</h3>';
+      html += '<div class="result-row highlight-row"><span>Taxa de esforço</span><span>' + taxa.toFixed(1).replace('.', ',') + ' %</span></div>';
+      html += '<div class="result-badge ' + badgeClass + '">' + badge + '</div>';
 
       res.hidden = false;
       res.innerHTML = html;

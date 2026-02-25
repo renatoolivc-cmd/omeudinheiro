@@ -40,35 +40,17 @@
 
     <div class="container sims-container">
 
-      <!-- TAXA DE ESFORÇO -->
-      <article class="sim-card" id="esforco">
-        <div class="sim-header">
-          <span class="sim-icon">📊</span>
-          <div>
-            <h2>Taxa de Esforço</h2>
-            <p>Descobre que percentagem do teu rendimento vai para prestações de crédito.</p>
-          </div>
-        </div>
-        <form class="sim-form" id="formEsforco" novalidate>
-          <div class="field">
-            <label for="ef_rendimento">Rendimento mensal líquido (€) *</label>
-            <input type="number" id="ef_rendimento" min="1" step="1" placeholder="Ex: 1200" required>
-          </div>
-          <div class="field">
-            <label for="ef_prestacoes">Total de prestações atuais (€) *</label>
-            <input type="number" id="ef_prestacoes" min="0" step="1" placeholder="Ex: 350" required>
-          </div>
-          <div class="field">
-            <label for="ef_nova">Nova prestação a adicionar (€)</label>
-            <input type="number" id="ef_nova" min="0" step="1" placeholder="Opcional">
-          </div>
-          <button type="submit" class="btn btn-primary">Calcular</button>
-          <div class="sim-result" id="resultEsforco" hidden></div>
-        </form>
-      </article>
+      <!-- TABS NAV -->
+      <div class="tabs-nav" role="tablist" aria-label="Simuladores">
+        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-automovel" data-tab="automovel">🚗 Créd. Automóvel</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-pessoal" data-tab="pessoal">💳 Créd. Pessoal</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-habitacao" data-tab="habitacao">🏠 Habitação</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-consolidacao" data-tab="consolidacao">🔄 Consolidação</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-esforco" data-tab="esforco">📊 Taxa de Esforço</button>
+      </div>
 
       <!-- CRÉDITO AUTOMÓVEL -->
-      <article class="sim-card" id="automovel">
+      <article class="sim-card tab-panel active" id="panel-automovel" role="tabpanel">
         <div class="sim-header">
           <span class="sim-icon">🚗</span>
           <div>
@@ -86,12 +68,12 @@
             <input type="number" id="au_entrada" min="0" step="1" placeholder="0" value="0">
           </div>
           <div class="field">
-            <label for="au_prazo">Prazo (meses) *</label>
-            <input type="number" id="au_prazo" min="6" max="120" step="1" placeholder="Ex: 60" required>
+            <label>TAN:</label>
+            <div class="tan-display">8,10 %</div>
           </div>
           <div class="field">
-            <label for="au_taxa">Taxa anual – TAEG aprox. (%) *</label>
-            <input type="number" id="au_taxa" min="0" step="0.01" placeholder="Ex: 7.5" required>
+            <label for="au_prazo">Prazo: <span id="au_prazo_label">60 meses (5 anos)</span></label>
+            <input type="range" id="au_prazo" min="6" max="120" value="60" step="1" class="slider">
           </div>
           <button type="submit" class="btn btn-primary">Calcular</button>
           <div class="sim-result" id="resultAutomovel" hidden></div>
@@ -99,7 +81,7 @@
       </article>
 
       <!-- CRÉDITO PESSOAL -->
-      <article class="sim-card" id="pessoal">
+      <article class="sim-card tab-panel" id="panel-pessoal" role="tabpanel" hidden>
         <div class="sim-header">
           <span class="sim-icon">💳</span>
           <div>
@@ -113,12 +95,12 @@
             <input type="number" id="cp_montante" min="1" step="1" placeholder="Ex: 5000" required>
           </div>
           <div class="field">
-            <label for="cp_prazo">Prazo (meses) *</label>
-            <input type="number" id="cp_prazo" min="6" max="120" step="1" placeholder="Ex: 48" required>
+            <label>TAN:</label>
+            <div class="tan-display">8,60 %</div>
           </div>
           <div class="field">
-            <label for="cp_taxa">Taxa anual (%) *</label>
-            <input type="number" id="cp_taxa" min="0" step="0.01" placeholder="Ex: 9.5" required>
+            <label for="cp_prazo">Prazo: <span id="cp_prazo_label">48 meses (4 anos)</span></label>
+            <input type="range" id="cp_prazo" min="6" max="84" value="48" step="1" class="slider">
           </div>
           <button type="submit" class="btn btn-primary">Calcular</button>
           <div class="sim-result" id="resultPessoal" hidden></div>
@@ -126,7 +108,7 @@
       </article>
 
       <!-- CRÉDITO HABITAÇÃO -->
-      <article class="sim-card" id="habitacao">
+      <article class="sim-card tab-panel" id="panel-habitacao" role="tabpanel" hidden>
         <div class="sim-header">
           <span class="sim-icon">🏠</span>
           <div>
@@ -148,12 +130,12 @@
             <input type="number" id="ch_montante" min="0" step="1" placeholder="Calculado automaticamente">
           </div>
           <div class="field">
-            <label for="ch_prazo">Prazo (anos) *</label>
-            <input type="number" id="ch_prazo" min="5" max="40" step="1" placeholder="Ex: 30" required>
+            <label>TAN:</label>
+            <div class="tan-display">2,60 %</div>
           </div>
           <div class="field">
-            <label for="ch_taxa">Taxa anual indicativa (%) *</label>
-            <input type="number" id="ch_taxa" min="0" step="0.01" placeholder="Ex: 3.5" required>
+            <label for="ch_prazo">Prazo: <span id="ch_prazo_label">360 meses (30 anos)</span></label>
+            <input type="range" id="ch_prazo" min="60" max="480" value="360" step="12" class="slider">
           </div>
           <button type="submit" class="btn btn-primary">Calcular</button>
           <div class="sim-result" id="resultHabitacao" hidden></div>
@@ -161,7 +143,7 @@
       </article>
 
       <!-- CONSOLIDAÇÃO -->
-      <article class="sim-card" id="consolidacao">
+      <article class="sim-card tab-panel" id="panel-consolidacao" role="tabpanel" hidden>
         <div class="sim-header">
           <span class="sim-icon">🔄</span>
           <div>
@@ -170,63 +152,87 @@
           </div>
         </div>
         <form class="sim-form" id="formConsolidacao" novalidate>
-          <fieldset class="credit-group">
-            <legend>Créditos atuais</legend>
-            <div class="credit-row">
-              <h4>Crédito 1</h4>
-              <div class="field">
-                <label for="co_m1">Montante em dívida (€) *</label>
-                <input type="number" id="co_m1" min="0" step="1" placeholder="Ex: 5000" required>
-              </div>
-              <div class="field">
-                <label for="co_p1">Prestação mensal (€) *</label>
-                <input type="number" id="co_p1" min="0" step="1" placeholder="Ex: 150" required>
-              </div>
+          <div class="field">
+            <label>Possui crédito habitação? *</label>
+            <div class="toggle-group">
+              <label class="toggle-option"><input type="radio" name="co_habitacao" value="sim"> Sim</label>
+              <label class="toggle-option"><input type="radio" name="co_habitacao" value="nao" checked> Não</label>
             </div>
-            <div class="credit-row">
-              <h4>Crédito 2</h4>
-              <div class="field">
-                <label for="co_m2">Montante em dívida (€)</label>
-                <input type="number" id="co_m2" min="0" step="1" placeholder="0">
-              </div>
-              <div class="field">
-                <label for="co_p2">Prestação mensal (€)</label>
-                <input type="number" id="co_p2" min="0" step="1" placeholder="0">
-              </div>
+          </div>
+          <div class="field">
+            <label for="co_total_divida">Valor total de todos os créditos (€) *</label>
+            <input type="number" id="co_total_divida" min="1" step="1" placeholder="Ex: 25000" required>
+          </div>
+          <div class="field">
+            <label for="co_total_prestacoes">Valor total das prestações mensais (€) *</label>
+            <input type="number" id="co_total_prestacoes" min="1" step="1" placeholder="Ex: 750" required>
+          </div>
+          <div class="field">
+            <label>Quer dinheiro extra? *</label>
+            <div class="toggle-group">
+              <label class="toggle-option"><input type="radio" name="co_extra" value="sim" id="co_extra_sim"> Sim</label>
+              <label class="toggle-option"><input type="radio" name="co_extra" value="nao" id="co_extra_nao" checked> Não</label>
             </div>
-            <div class="credit-row">
-              <h4>Crédito 3</h4>
-              <div class="field">
-                <label for="co_m3">Montante em dívida (€)</label>
-                <input type="number" id="co_m3" min="0" step="1" placeholder="0">
-              </div>
-              <div class="field">
-                <label for="co_p3">Prestação mensal (€)</label>
-                <input type="number" id="co_p3" min="0" step="1" placeholder="0">
-              </div>
-            </div>
-          </fieldset>
-          <fieldset class="credit-group">
-            <legend>Novo crédito consolidado</legend>
-            <div class="field">
-              <label for="co_taxa_nova">Taxa anual do novo crédito (%) *</label>
-              <input type="number" id="co_taxa_nova" min="0" step="0.01" placeholder="Ex: 8" required>
-            </div>
-            <div class="field">
-              <label for="co_prazo_novo">Novo prazo (meses) *</label>
-              <input type="number" id="co_prazo_novo" min="6" step="1" placeholder="Ex: 84" required>
-            </div>
-          </fieldset>
+          </div>
+          <div class="field" id="co_extra_field" hidden>
+            <label for="co_extra_valor">Se sim, quanto? (€)</label>
+            <input type="number" id="co_extra_valor" min="0" step="1" placeholder="Ex: 5000">
+          </div>
+          <div class="field">
+            <label>TAN:</label>
+            <div class="tan-display">2,60 %</div>
+          </div>
+          <div class="field">
+            <label for="co_prazo">Em quantos anos pretende pagar? <span id="co_prazo_label">240 meses (20 anos)</span></label>
+            <input type="range" id="co_prazo" min="12" max="480" value="240" step="12" class="slider">
+          </div>
           <button type="submit" class="btn btn-primary">Calcular</button>
           <div class="sim-result" id="resultConsolidacao" hidden></div>
         </form>
       </article>
+
+      <!-- TAXA DE ESFORÇO -->
+      <article class="sim-card tab-panel" id="panel-esforco" role="tabpanel" hidden>
+        <div class="sim-header">
+          <span class="sim-icon">📊</span>
+          <div>
+            <h2>Taxa de Esforço</h2>
+            <p>Descobre que percentagem do teu rendimento vai para prestações de crédito.</p>
+          </div>
+        </div>
+        <form class="sim-form" id="formEsforco" novalidate>
+          <div class="field">
+            <label for="ef_rendimento">Rendimento mensal líquido (€) *</label>
+            <input type="number" id="ef_rendimento" min="1" step="1" placeholder="Ex: 1200" required>
+          </div>
+          <div class="field">
+            <label for="ef_prestacoes">Total de prestações mensais atuais (€) *</label>
+            <input type="number" id="ef_prestacoes" min="0" step="1" placeholder="Ex: 350" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Calcular</button>
+          <div class="sim-result" id="resultEsforco" hidden></div>
+        </form>
+      </article>
+
+      <!-- ESPECIALISTA -->
+      <aside class="specialist-card">
+        <div class="specialist-avatar">👤</div>
+        <div class="specialist-info">
+          <h3>Sérgio Sousa</h3>
+          <p class="specialist-title">Especialista em Finanças</p>
+          <p>Precisas de ajuda com o teu crédito? Fala comigo:</p>
+          <a href="mailto:Sergio.sousa@rede.doutorfinancas.pt" class="btn btn-primary btn-specialist">📧 Enviar email</a>
+        </div>
+      </aside>
 
     </div>
   </main>
 
   <footer class="site-footer">
     <div class="container footer-inner">
+      <div class="footer-specialist">
+        <strong>Sérgio Sousa</strong> – Especialista em Finanças · <a href="mailto:Sergio.sousa@rede.doutorfinancas.pt">Sergio.sousa@rede.doutorfinancas.pt</a>
+      </div>
       <div class="footer-links">
         <a href="index.html">Início</a>
         <a href="simuladores.html">Simuladores</a>

@@ -324,6 +324,27 @@ a:hover { color: var(--blue-600); }
 .footer-links { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
 .footer-links a { color: var(--gray-300); font-size: .9rem; text-decoration: none; }
 .footer-links a:hover { color: var(--white); }
+.footer-specialist {
+  margin-bottom: 1.25rem; font-size: .88rem; color: var(--gray-300);
+}
+.footer-specialist a { color: var(--blue-300); }
+.footer-specialist a:hover { color: var(--white); }
+
+/* Specialist inline (contact page) */
+.specialist-card-inline {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--blue-50); border: 1.5px solid var(--blue-200);
+  border-radius: var(--radius); padding: 1.25rem; margin-bottom: 2rem;
+}
+.specialist-card-inline .specialist-avatar {
+  font-size: 2rem; flex-shrink: 0;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--blue-100); display: flex; align-items: center; justify-content: center;
+}
+.specialist-card-inline strong { color: var(--gray-900); }
+.specialist-card-inline .specialist-title { font-size: .8rem; color: var(--gray-500); margin: 2px 0 4px; }
+.specialist-card-inline a { font-size: .88rem; }
+
 .footer-disclaimer { font-size: .78rem; color: var(--gray-500); max-width: 600px; margin: 0 auto 1rem; }
 .footer-copy { font-size: .8rem; color: var(--gray-500); }
 
