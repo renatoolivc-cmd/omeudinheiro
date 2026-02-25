@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Simuladores de crédito gratuitos: habitação, pessoal, automóvel, consolidação e taxa de esforço.">
+  <meta name="description" content="Simuladores de crédito gratuitos: habitação, pessoal, consolidação e taxa de esforço.">
   <title>Simuladores de Crédito – omeudinheiro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -40,48 +40,36 @@
 
     <div class="container sims-container">
 
-      <!-- TABS NAV -->
-      <div class="tabs-nav" role="tablist" aria-label="Simuladores">
-        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-automovel" data-tab="automovel">🚗 Créd. Automóvel</button>
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-pessoal" data-tab="pessoal">💳 Créd. Pessoal</button>
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-habitacao" data-tab="habitacao">🏠 Habitação</button>
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-consolidacao" data-tab="consolidacao">🔄 Consolidação</button>
-        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-esforco" data-tab="esforco">📊 Taxa de Esforço</button>
+      <!-- MENU DE SIMULADORES -->
+      <div class="sim-menu" id="simMenu">
+        <h2 class="sim-menu-title">Escolhe o teu simulador</h2>
+        <div class="sim-menu-grid">
+          <button class="sim-menu-card" data-open="pessoal">
+            <span class="sim-menu-icon">💳</span>
+            <h3>Crédito Pessoal</h3>
+            <p>Simula a prestação para o montante que precisas.</p>
+          </button>
+          <button class="sim-menu-card" data-open="habitacao">
+            <span class="sim-menu-icon">🏠</span>
+            <h3>Crédito Habitação</h3>
+            <p>Descobre quanto vais pagar por mês pela tua casa.</p>
+          </button>
+          <button class="sim-menu-card" data-open="consolidacao">
+            <span class="sim-menu-icon">🔄</span>
+            <h3>Consolidação de Créditos</h3>
+            <p>Junta vários créditos num só e poupa por mês.</p>
+          </button>
+          <button class="sim-menu-card" data-open="esforco">
+            <span class="sim-menu-icon">📊</span>
+            <h3>Taxa de Esforço</h3>
+            <p>Verifica se as tuas prestações estão dentro de limites saudáveis.</p>
+          </button>
+        </div>
       </div>
 
-      <!-- CRÉDITO AUTOMÓVEL -->
-      <article class="sim-card tab-panel active" id="panel-automovel" role="tabpanel">
-        <div class="sim-header">
-          <span class="sim-icon">🚗</span>
-          <div>
-            <h2>Crédito Automóvel</h2>
-            <p>Calcula a prestação mensal para o carro que queres comprar.</p>
-          </div>
-        </div>
-        <form class="sim-form" id="formAutomovel" novalidate>
-          <div class="field">
-            <label for="au_valor">Valor do carro (€) *</label>
-            <input type="number" id="au_valor" min="1" step="1" placeholder="Ex: 20000" required>
-          </div>
-          <div class="field">
-            <label for="au_entrada">Entrada inicial (€)</label>
-            <input type="number" id="au_entrada" min="0" step="1" placeholder="0" value="0">
-          </div>
-          <div class="field">
-            <label>TAN:</label>
-            <div class="tan-display">8,10 %</div>
-          </div>
-          <div class="field">
-            <label for="au_prazo">Prazo: <span id="au_prazo_label">60 meses (5 anos)</span></label>
-            <input type="range" id="au_prazo" min="6" max="120" value="60" step="1" class="slider">
-          </div>
-          <button type="submit" class="btn btn-primary">Calcular</button>
-          <div class="sim-result" id="resultAutomovel" hidden></div>
-        </form>
-      </article>
-
       <!-- CRÉDITO PESSOAL -->
-      <article class="sim-card tab-panel" id="panel-pessoal" role="tabpanel" hidden>
+      <article class="sim-card sim-panel" id="panel-pessoal" hidden>
+        <button class="sim-back" aria-label="Voltar ao menu">← Voltar aos simuladores</button>
         <div class="sim-header">
           <span class="sim-icon">💳</span>
           <div>
@@ -108,7 +96,8 @@
       </article>
 
       <!-- CRÉDITO HABITAÇÃO -->
-      <article class="sim-card tab-panel" id="panel-habitacao" role="tabpanel" hidden>
+      <article class="sim-card sim-panel" id="panel-habitacao" hidden>
+        <button class="sim-back" aria-label="Voltar ao menu">← Voltar aos simuladores</button>
         <div class="sim-header">
           <span class="sim-icon">🏠</span>
           <div>
@@ -143,7 +132,8 @@
       </article>
 
       <!-- CONSOLIDAÇÃO -->
-      <article class="sim-card tab-panel" id="panel-consolidacao" role="tabpanel" hidden>
+      <article class="sim-card sim-panel" id="panel-consolidacao" hidden>
+        <button class="sim-back" aria-label="Voltar ao menu">← Voltar aos simuladores</button>
         <div class="sim-header">
           <span class="sim-icon">🔄</span>
           <div>
@@ -192,7 +182,8 @@
       </article>
 
       <!-- TAXA DE ESFORÇO -->
-      <article class="sim-card tab-panel" id="panel-esforco" role="tabpanel" hidden>
+      <article class="sim-card sim-panel" id="panel-esforco" hidden>
+        <button class="sim-back" aria-label="Voltar ao menu">← Voltar aos simuladores</button>
         <div class="sim-header">
           <span class="sim-icon">📊</span>
           <div>

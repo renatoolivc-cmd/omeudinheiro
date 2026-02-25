@@ -42,21 +42,41 @@
   }
 
   // ================================
-  // TABS
+  // MENU ↔ PANEL NAVIGATION
   // ================================
-  var tabBtns = document.querySelectorAll('.tab-btn');
-  var panels = document.querySelectorAll('.tab-panel');
+  var simMenu = document.getElementById('simMenu');
+  var menuCards = document.querySelectorAll('.sim-menu-card');
+  var simPanels = document.querySelectorAll('.sim-panel');
+  var backBtns = document.querySelectorAll('.sim-back');
 
-  tabBtns.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      tabBtns.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
-      panels.forEach(function (p) { p.classList.remove('active'); p.hidden = true; });
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
-      var panel = document.getElementById('panel-' + btn.dataset.tab);
-      if (panel) { panel.classList.add('active'); panel.hidden = false; }
-    });
+  function showMenu() {
+    simPanels.forEach(function (p) { p.hidden = true; });
+    if (simMenu) simMenu.hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function openPanel(name) {
+    if (simMenu) simMenu.hidden = true;
+    simPanels.forEach(function (p) { p.hidden = true; });
+    var panel = document.getElementById('panel-' + name);
+    if (panel) { panel.hidden = false; }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  menuCards.forEach(function (card) {
+    card.addEventListener('click', function () { openPanel(card.dataset.open); });
   });
+
+  backBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () { showMenu(); });
+  });
+
+  // Support direct linking via hash (e.g. simuladores.html#habitacao)
+  if (window.location.hash) {
+    var target = window.location.hash.substring(1);
+    var targetPanel = document.getElementById('panel-' + target);
+    if (targetPanel) { openPanel(target); }
+  }
 
   // ================================
   // SLIDERS — live label updates
