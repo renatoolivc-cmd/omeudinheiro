@@ -18,14 +18,14 @@
 }
 .sim-menu-card {
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  background: var(--white); border: 1.5px solid var(--gray-200);
-  border-radius: var(--radius-lg); padding: 2rem 1.5rem;
+  background: var(--white); border: .5px solid var(--gray-200);
+  border-radius: var(--radius-lg); padding: 2.25rem 1.5rem;
   cursor: pointer; font-family: var(--font);
   box-shadow: var(--shadow-sm); transition: all var(--transition);
 }
 .sim-menu-card:hover {
-  transform: translateY(-4px); box-shadow: var(--shadow-lg);
-  border-color: var(--blue-400);
+  transform: translateY(-8px); box-shadow: var(--shadow-xl);
+  border-color: transparent;
 }
 .sim-menu-card:focus-visible { outline: 3px solid var(--cyan-400); outline-offset: 2px; }
 .sim-menu-icon { font-size: 2.2rem; margin-bottom: .75rem; }
@@ -175,15 +175,22 @@
 /* --- Specialist Card --- */
 .specialist-card {
   display: flex; align-items: center; gap: 1.5rem;
-  background: linear-gradient(135deg, var(--blue-800), var(--blue-600));
-  border-radius: var(--radius-lg); padding: 2rem;
+  background: linear-gradient(135deg, var(--blue-900), var(--blue-600));
+  border-radius: var(--radius-lg); padding: 2rem 2.5rem;
   color: var(--white);
+  box-shadow: 0 8px 32px rgba(13,27,62,.2);
+  transition: all var(--transition);
 }
+.specialist-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(13,27,62,.25); }
 .specialist-avatar {
   font-size: 3rem; flex-shrink: 0;
-  width: 70px; height: 70px; border-radius: 50%;
-  background: rgba(255,255,255,.15);
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,255,255,.12);
   display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.specialist-avatar img {
+  width: 100%; height: 100%; object-fit: cover;
 }
 .specialist-info h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: .15rem; }
 .specialist-title { font-size: .85rem; color: var(--blue-200); margin-bottom: .5rem; }
