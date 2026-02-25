@@ -223,6 +223,15 @@
   // ================================
   // 4) Consolidação de Créditos
   // ================================
+  // Toggle "tem crédito habitação?"
+  var coHabSim = document.getElementById('co_hab_sim');
+  var coHabNao = document.getElementById('co_hab_nao');
+  var coHabFields = document.getElementById('co_hab_fields');
+  if (coHabSim && coHabNao && coHabFields) {
+    coHabSim.addEventListener('change', function () { coHabFields.hidden = false; });
+    coHabNao.addEventListener('change', function () { coHabFields.hidden = true; });
+  }
+
   // Toggle "dinheiro extra"
   var extraSim = document.getElementById('co_extra_sim');
   var extraNao = document.getElementById('co_extra_nao');
@@ -232,6 +241,36 @@
     extraNao.addEventListener('change', function () { extraField.hidden = true; });
   }
 
+  // Lead form handler (inside results)
+  function handleLeadForm() {
+    var form = document.getElementById('leadFormCons');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var nome = document.getElementById('lead_nome');
+      var email = document.getElementById('lead_email');
+      var tel = document.getElementById('lead_tel');
+      var feedback = document.getElementById('leadFeedback');
+      var valid = true;
+      [nome, email, tel].forEach(function (f) { f.classList.remove('error'); });
+
+      if (!nome.value.trim()) { nome.classList.add('error'); valid = false; }
+      if (!tel.value.trim()) { tel.classList.add('error'); valid = false; }
+      if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { email.classList.add('error'); valid = false; }
+
+      if (!valid) {
+        feedback.hidden = false;
+        feedback.className = 'form-feedback error';
+        feedback.textContent = 'Por favor preenche todos os campos corretamente.';
+        return;
+      }
+      feedback.hidden = false;
+      feedback.className = 'form-feedback success';
+      feedback.textContent = '✅ Obrigado, ' + nome.value.trim() + '! Vamos enviar-te uma proposta personalizada em breve.';
+      form.reset();
+    });
+  }
+
   var fCons = document.getElementById('formConsolidacao');
   if (fCons) {
     fCons.addEventListener('submit', function (e) {
@@ -239,26 +278,57 @@
       var res = document.getElementById('resultConsolidacao');
       clearResult('resultConsolidacao');
 
-      var totalDivida = val('co_total_divida');
-      var totalPrestacoes = val('co_total_prestacoes');
-      var extra = 0;
-      if (extraSim && extraSim.checked) { extra = val('co_extra_valor') || 0; }
+      var temHab = coHabSim && coHabSim.checked;
+      var habEmprestimo = temHab ? (val('co_hab_emprestimo') || 0) : 0;
+      var habPrestacao = temHab ? (val('co_hab_prestacao') || 0) : 0;
+      var outrosDivida = val('co_total_divida') || 0;
+      var outrosPrestacoes = val('co_total_prestacoes') || 0;
+      var extra = (extraSim && extraSim.checked) ? (val('co_extra_valor') || 0) : 0;
+      var rendimento = val('co_rendimento');
       var prazo = parseInt(document.getElementById('co_prazo').value);
 
-      if (!totalDivida || totalDivida <= 0 || !totalPrestacoes || totalPrestacoes <= 0) {
-        showError(res, 'Por favor preenche o valor total dos créditos e das prestações.');
+      // Validation
+      if (outrosDivida <= 0 && habEmprestimo <= 0) {
+        showError(res, 'Por favor preenche o valor dos créditos.');
+        return;
+      }
+      if (outrosPrestacoes <= 0 && habPrestacao <= 0) {
+        showError(res, 'Por favor preenche o valor das prestações.');
+        return;
+      }
+      if (!rendimento || rendimento <= 0) {
+        showError(res, 'Por favor preenche o rendimento mensal.');
+        return;
+      }
+      if (prazo <= 0) {
+        showError(res, 'Por favor seleciona o prazo no slider.');
+        return;
+      }
+      if (temHab && (!habEmprestimo || habEmprestimo <= 0)) {
+        showError(res, 'Por favor preenche o valor do empréstimo habitação.');
         return;
       }
 
-      var montante = totalDivida + extra;
+      var totalDivida = habEmprestimo + outrosDivida + extra;
+      var totalPrestacoes = habPrestacao + outrosPrestacoes;
+
       var rm = (TAN.consolidacao / 100) / 12;
-      var prestacaoNova = pmt(montante, rm, prazo);
+      var prestacaoNova = pmt(totalDivida, rm, prazo);
       var diferenca = totalPrestacoes - prestacaoNova;
       var totalNovo = prestacaoNova * prazo;
-      var juros = totalNovo - montante;
+      var juros = totalNovo - totalDivida;
+      var taxaEsforcoAntes = (totalPrestacoes / rendimento) * 100;
+      var taxaEsforcoDepois = (prestacaoNova / rendimento) * 100;
 
-      var html = '<h3>Resultado</h3>';
-      html += '<div class="result-row"><span>Montante a consolidar</span><span>' + fmt(montante) + ' €</span></div>';
+      var html = '<h3>Resultado da Consolidação</h3>';
+
+      if (temHab) {
+        html += '<div class="result-row"><span>Empréstimo habitação</span><span>' + fmt(habEmprestimo) + ' €</span></div>';
+        html += '<div class="result-row"><span>Outros créditos</span><span>' + fmt(outrosDivida) + ' €</span></div>';
+        if (extra > 0) html += '<div class="result-row"><span>Dinheiro extra</span><span>' + fmt(extra) + ' €</span></div>';
+      }
+
+      html += '<div class="result-row"><span>Montante total a consolidar</span><span>' + fmt(totalDivida) + ' €</span></div>';
       html += '<div class="result-row"><span>Prestação atual total</span><span>' + fmt(totalPrestacoes) + ' €/mês</span></div>';
       html += '<div class="result-row highlight-row"><span>Nova prestação estimada</span><span>' + fmt(prestacaoNova) + ' €/mês</span></div>';
 
@@ -268,12 +338,33 @@
         html += '<div class="result-row"><span>Aumento mensal</span><span style="color:#991b1b;font-weight:700">+ ' + fmt(Math.abs(diferenca)) + ' €</span></div>';
       }
 
+      // Taxa de esforço
+      var badgeAntes = taxaEsforcoAntes < 50 ? 'badge-green' : 'badge-red';
+      var badgeDepois = taxaEsforcoDepois < 50 ? 'badge-green' : 'badge-red';
+      html += '<div style="margin-top:1rem"><strong>Taxa de Esforço</strong></div>';
+      html += '<div class="result-row"><span>Antes</span><span class="result-badge ' + badgeAntes + '" style="margin:0;padding:.25rem .75rem">' + taxaEsforcoAntes.toFixed(1).replace('.', ',') + ' %</span></div>';
+      html += '<div class="result-row"><span>Depois</span><span class="result-badge ' + badgeDepois + '" style="margin:0;padding:.25rem .75rem">' + taxaEsforcoDepois.toFixed(1).replace('.', ',') + ' %</span></div>';
+
       html += '<div class="result-row"><span>Total pago (novo crédito)</span><span>' + fmt(totalNovo) + ' €</span></div>';
       html += '<div class="result-row"><span>Total de juros</span><span>' + fmt(juros) + ' €</span></div>';
-      html += '<p class="result-note">⚠️ TAN indicativa de ' + TAN.consolidacao.toFixed(2).replace('.', ',') + '%. Simulação indicativa, não constitui proposta vinculativa. O aumento do prazo pode significar mais juros no total.</p>';
+
+      html += '<p class="result-note">⚠️ TAN indicativa de ' + TAN.consolidacao.toFixed(2).replace('.', ',') + '%. Simulação indicativa, não constitui proposta vinculativa.</p>';
+
+      // Lead form
+      html += '<div class="lead-form-box">';
+      html += '<h3>📩 Receber proposta personalizada</h3>';
+      html += '<p>Deixa os teus dados e um especialista entrará em contacto contigo.</p>';
+      html += '<form id="leadFormCons" novalidate>';
+      html += '<div class="field"><label for="lead_nome">Nome *</label><input type="text" id="lead_nome" placeholder="O teu nome" required></div>';
+      html += '<div class="field"><label for="lead_tel">Telefone *</label><input type="tel" id="lead_tel" placeholder="Ex: 912345678" required></div>';
+      html += '<div class="field"><label for="lead_email">Email *</label><input type="email" id="lead_email" placeholder="email@exemplo.com" required></div>';
+      html += '<button type="submit" class="btn btn-primary">Enviar pedido</button>';
+      html += '<div class="form-feedback" id="leadFeedback" hidden></div>';
+      html += '</form></div>';
 
       res.hidden = false;
       res.innerHTML = html;
+      handleLeadForm();
     });
   }
 

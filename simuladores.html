@@ -145,18 +145,32 @@
           <div class="field">
             <label>Possui crédito habitação? *</label>
             <div class="toggle-group">
-              <label class="toggle-option"><input type="radio" name="co_habitacao" value="sim"> Sim</label>
-              <label class="toggle-option"><input type="radio" name="co_habitacao" value="nao" checked> Não</label>
+              <label class="toggle-option"><input type="radio" name="co_habitacao" value="sim" id="co_hab_sim"> Sim</label>
+              <label class="toggle-option"><input type="radio" name="co_habitacao" value="nao" id="co_hab_nao" checked> Não</label>
             </div>
           </div>
+
+          <!-- Campos crédito habitação (aparecem se Sim) -->
+          <div id="co_hab_fields" hidden>
+            <div class="field">
+              <label for="co_hab_emprestimo">Qual o valor total do empréstimo habitação? (€) *</label>
+              <input type="number" id="co_hab_emprestimo" min="0" step="1" placeholder="Ex: 120000">
+            </div>
+            <div class="field">
+              <label for="co_hab_prestacao">Prestação do crédito habitação? (€) *</label>
+              <input type="number" id="co_hab_prestacao" min="0" step="1" placeholder="Ex: 450">
+            </div>
+          </div>
+
           <div class="field">
-            <label for="co_total_divida">Valor total de todos os créditos (€) *</label>
-            <input type="number" id="co_total_divida" min="1" step="1" placeholder="Ex: 25000" required>
+            <label for="co_total_divida">Valor total de outros créditos (€) *</label>
+            <input type="number" id="co_total_divida" min="0" step="1" placeholder="Ex: 15000" required>
           </div>
           <div class="field">
-            <label for="co_total_prestacoes">Valor total das prestações mensais (€) *</label>
-            <input type="number" id="co_total_prestacoes" min="1" step="1" placeholder="Ex: 750" required>
+            <label for="co_total_prestacoes">Prestação total dos outros créditos (€) *</label>
+            <input type="number" id="co_total_prestacoes" min="0" step="1" placeholder="Ex: 350" required>
           </div>
+
           <div class="field">
             <label>Quer dinheiro extra? *</label>
             <div class="toggle-group">
@@ -168,13 +182,19 @@
             <label for="co_extra_valor">Se sim, quanto? (€)</label>
             <input type="number" id="co_extra_valor" min="0" step="1" placeholder="Ex: 5000">
           </div>
+
+          <div class="field">
+            <label for="co_rendimento">Rendimento mensal líquido (€) *</label>
+            <input type="number" id="co_rendimento" min="1" step="1" placeholder="Ex: 1500" required>
+          </div>
+
           <div class="field">
             <label>TAN:</label>
             <div class="tan-display">2,60 %</div>
           </div>
           <div class="field">
-            <label for="co_prazo">Em quantos anos pretende pagar? <span id="co_prazo_label">240 meses (20 anos)</span></label>
-            <input type="range" id="co_prazo" min="12" max="480" value="240" step="12" class="slider">
+            <label for="co_prazo">Em quantos anos pretende pagar? <span id="co_prazo_label">0 meses</span></label>
+            <input type="range" id="co_prazo" min="0" max="480" value="0" step="12" class="slider">
           </div>
           <button type="submit" class="btn btn-primary">Calcular</button>
           <div class="sim-result" id="resultConsolidacao" hidden></div>
